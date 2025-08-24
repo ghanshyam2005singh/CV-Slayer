@@ -124,7 +124,6 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 # Database
 MONGODB_URI=mongodb://localhost:27017/cv-slayer
-# Or MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/cv-slayer
 
 # Authentication & Security
 JWT_SECRET=your_super_secure_jwt_secret_minimum_32_characters
