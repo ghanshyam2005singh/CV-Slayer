@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'production';
 
-app.use('/api', require('./routes/health'));
+// app.use('/api', require('./routes/health'));
 
 // Trust proxy for deployment
 app.set('trust proxy', 1);
@@ -78,15 +78,15 @@ try {
 }
 
 // Health check
-app.get('/api/health', (req, res) => {
-  const dbStatus = getConnectionStatus();
-  res.json({
-    success: true,
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    database: { status: dbStatus.connected ? 'connected' : 'disconnected' }
-  });
-});
+// app.get('/api/health', (req, res) => {
+//   const dbStatus = getConnectionStatus();
+//   res.json({
+//     success: true,
+//     status: 'OK',
+//     timestamp: new Date().toISOString(),
+//     database: { status: dbStatus.connected ? 'connected' : 'disconnected' }
+//   });
+// });
 
 // Simple error handling
 app.use((error, req, res, next) => {
