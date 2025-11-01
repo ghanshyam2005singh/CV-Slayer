@@ -9,7 +9,7 @@ class GeminiService {
     this.genAI = new GoogleGenerativeAI(apiKey);
     
     this.model = this.genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       generationConfig: {
         temperature: 0.6,
         topP: 0.8,
@@ -192,7 +192,7 @@ RESPONSE FORMAT (VALID JSON ONLY):
           metadata: {
             requestId,
             processingTime,
-            modelUsed: 'gemini-1.5-flash',
+            modelUsed: 'gemini-2.0-flash',
             timestamp: new Date().toISOString()
           }
         }
