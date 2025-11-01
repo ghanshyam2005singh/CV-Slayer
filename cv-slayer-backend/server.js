@@ -77,16 +77,16 @@ try {
   console.error('⚠️ Admin routes not loaded:', error.message);
 }
 
-// Health check
-// app.get('/api/health', (req, res) => {
-//   const dbStatus = getConnectionStatus();
-//   res.json({
-//     success: true,
-//     status: 'OK',
-//     timestamp: new Date().toISOString(),
-//     database: { status: dbStatus.connected ? 'connected' : 'disconnected' }
-//   });
-// });
+//Health check
+app.get('/api/health', (req, res) => {
+  const dbStatus = getConnectionStatus();
+  res.json({
+    success: true,
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    database: { status: dbStatus.connected ? 'connected' : 'disconnected' }
+  });
+});
 
 // Simple error handling
 app.use((error, req, res, next) => {
