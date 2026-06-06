@@ -531,11 +531,6 @@ function App() {
                     <h4>🤖 AI Analysis</h4>
                     <p>We use AI to analyze your resume and provide feedback.</p>
                   </section>
-
-                  <section>
-                    <h4>📞 Contact</h4>
-                    <p>Questions? Email: outlercodie.com@gmail.com</p>
-                  </section>
                 </div>
               </div>
               
@@ -633,12 +628,12 @@ function App() {
               </div>
               <div className="footer-section">
                 <h4>Contact</h4>
-                <p>outlercodie.com@gmail.com</p>
-                <p><a href='https://iron-industry.tech'>Iron Industry</a></p>
+                <p>Ghanshyam Singh</p>
+                <p><a href='https://ghanshyamsingh-dev.vercel.app/' target="_blank" rel="noopener noreferrer">Portfolio</a></p>
               </div>
             </div>
             <div className="footer-bottom">
-              <p>&copy; 2024 Iron Industry. All rights reserved.</p>
+              <p>&copy; 2026 Ghanshyam Singh. All rights reserved.</p>
             </div>
           </div>
         </footer>
