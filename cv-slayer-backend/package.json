@@ -22,7 +22,7 @@
     "analysis",
     "gemini"
   ],
-  "author": "Iron Industry",
+  "author": "Ghanshyam Singh",
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.2.1",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './Navbar.css';
 
-const Navbar = () => {
+const Navbar = ({ onNavClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,6 +92,12 @@ const Navbar = () => {
 
   // PRODUCTION FIX - Enhanced scroll to section with input validation
   const scrollToSection = useCallback(async (sectionId) => {
+    // If we're on the results page, any nav click goes back to home
+    if (onNavClick) {
+      onNavClick();
+      return;
+    }
+
     // Input validation
     if (!sectionId || typeof sectionId !== 'string') {
       setError('Navigation failed. Please try again.');

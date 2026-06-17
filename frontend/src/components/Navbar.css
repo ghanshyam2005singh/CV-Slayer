@@ -1,64 +1,63 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(17, 17, 16, 0.96);
+  backdrop-filter: blur(8px);
   z-index: 1000;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .navbar-scrolled {
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 60px;
-  /* FIXED: Force horizontal layout */
   flex-direction: row;
   flex-wrap: nowrap;
-  min-height: 60px;
 }
 
-/* Simple Logo */
+/* Logo */
 .navbar-logo {
   display: flex;
   align-items: center;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #fff;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: opacity 0.2s;
   flex-shrink: 0;
+  letter-spacing: -0.02em;
 }
 
 .navbar-logo:hover {
-  color: #667eea;
+  opacity: 0.8;
 }
 
 .logo-text {
-   background:  #667eea ;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
   white-space: nowrap;
 }
 
-/* Navigation Menu */
+/* Nav Menu */
 .navbar-menu {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 8px;
+  gap: 2px;
 }
 
 .navbar-item {
@@ -69,44 +68,51 @@
 .navbar-link {
   background: none;
   border: none;
-  color: #2c3e50;
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  padding: 10px 16px;
-  border-radius: 20px;
+  padding: 8px 14px;
+  border-radius: 5px;
   font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-size: 0.88rem;
+  transition: color 0.2s ease, background 0.2s ease;
   cursor: pointer;
   white-space: nowrap;
+  font-family: inherit;
 }
 
 .navbar-link:hover {
-  background: #f8f9fa;
-  color: #667eea;
-  transform: translateY(-1px);
+  color: #fff;
+  background: rgba(255,255,255,0.07);
 }
 
-/* CTA Button Style */
+.navbar-link.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.navbar-link.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* CTA nav button */
 .navbar-link.cta-nav {
-  background:  #667eea ;
+  background: #D94F3D;
   color: white !important;
   font-weight: 600;
-  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+  padding: 8px 16px;
 }
 
 .navbar-link.cta-nav:hover {
-  background: #5a6fd8;
-  box-shadow: 0 5px 16px rgba(102, 126, 234, 0.4);
-  transform: translateY(-2px);
+  background: #B83A2A;
   color: white;
 }
 
 .navbar-link.cta-nav:disabled {
-  color: #fff !important;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* Mobile Menu Toggle */
+/* Mobile Toggle */
 .navbar-toggle {
   display: none;
   flex-direction: column;
@@ -123,12 +129,12 @@
 }
 
 .navbar-toggle-line {
-  width: 22px;
-  height: 2px;
-  background: #2c3e50;
-  margin: 2px 0;
-  border-radius: 2px;
-  transition: all 0.3s ease;
+  width: 20px;
+  height: 1.5px;
+  background: rgba(255,255,255,0.8);
+  margin: 2.5px 0;
+  border-radius: 1px;
+  transition: all 0.25s ease;
 }
 
 .navbar-toggle.active .navbar-toggle-line:nth-child(1) {
@@ -140,29 +146,22 @@
 }
 
 .navbar-toggle.active .navbar-toggle-line:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Mobile Styles */
+/* Mobile menu */
 @media (max-width: 768px) {
-  /* FIXED: Explicit horizontal layout for mobile */
   .navbar-container {
-    padding: 0 15px;
+    padding: 0 16px;
     height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap;
   }
 
   .navbar-toggle {
     display: flex;
-  }
-
-  .navbar-logo {
-    font-size: 1.3rem;
-    flex-shrink: 0;
   }
 
   .navbar-menu {
@@ -171,20 +170,18 @@
     left: -100%;
     width: 100%;
     height: calc(100vh - 60px);
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
+    background: rgba(17, 17, 16, 0.98);
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     padding-top: 40px;
-    transition: left 0.3s ease;
-    gap: 15px;
+    transition: left 0.25s ease;
+    gap: 8px;
   }
 
   .navbar-menu-active {
     left: 0;
   }
-  
 
   .navbar-item {
     width: 80%;
@@ -194,123 +191,34 @@
   .navbar-link {
     width: 100%;
     text-align: center;
-    padding: 12px 20px;
+    padding: 14px 20px;
     font-size: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-    background: white;
-    margin: 3px 0;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.7);
   }
 
   .navbar-link.cta-nav {
-     background:  #667eea ;
+    background: #D94F3D;
     color: white;
-    box-shadow: 0 5px 16px rgba(102, 126, 234, 0.3);
   }
 }
 
 @media (max-width: 480px) {
   .navbar-container {
-    padding: 0 10px;
-    min-height: 60px;
-    height: 60px;
-    /* FIXED: Ensure horizontal layout on small screens */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .navbar-logo {
-    font-size: 1.2rem;
-  }
-
-  .navbar-toggle {
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-  }
-
-  .navbar-toggle-line {
-    width: 20px;
-  }
-
-  .navbar-link {
-    font-size: 0.95rem;
-    padding: 10px 18px;
+    padding: 0 12px;
   }
 }
 
-/* Fix for very small screens */
-@media (max-width: 320px) {
-  .navbar-container {
-    padding: 0 8px;
-    /* FIXED: Maintain horizontal layout */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .navbar-logo {
-    font-size: 1.1rem;
-  }
-  
-  .logo-text {
-    font-size: inherit;
-  }
-}
-
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Add these to your Navbar.css for the enhanced features */
-.navbar-error {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #ff4444;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  z-index: 10000;
-  animation: slideDown 0.3s ease;
-}
-
-.loading-spinner, .button-spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-left: 8px;
-}
-
-.navbar-link.active {
-  color: #667eea;
-  font-weight: 600;
-}
-
-.navbar-link.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
+/* Overlay */
 .navbar-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 998;
 }
 
+/* Utility */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -323,12 +231,50 @@ html {
   border: 0;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Loading indicators */
+.loading-spinner, .button-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid transparent;
+  border-top: 1.5px solid currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 6px;
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Navbar error */
+.navbar-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #D94F3D;
+  color: white;
+  padding: 10px 16px;
+  text-align: center;
+  z-index: 10000;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.navbar-error .error-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.navbar-error .error-close:hover {
+  opacity: 1;
 }

@@ -1,4 +1,4 @@
-# 🩸 CV Slayer 😈 — Brutally Honest Resume Roaster
+# CV Slayer  — Brutally Honest Resume Roaster
 
 CV Slayer is not your typical resume reviewer. It's the dark-humored, brutally honest, slightly unhinged HR you never wanted to meet... but probably needed to. Choose how hard you want to get roasted — from "Pyar Se 💘" to "Dhang Se 😡" — and watch your resume get shredded with style (and swears 😬).
 

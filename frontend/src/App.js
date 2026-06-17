@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import ResultsDisplay from './components/ResultsDisplay';
@@ -42,6 +42,86 @@ function App() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [loadingStep, setLoadingStep] = useState('');
+  const [roastMsgIndex, setRoastMsgIndex] = useState(0);
+  const [terminalLines, setTerminalLines] = useState([]);
+  const roastIntervalRef = useRef(null);
+  const terminalIntervalRef = useRef(null);
+
+  const roastMessages = [
+    "Found 'team player' written 3 times. Interesting strategy.",
+    "Scanning for actual numbers in your achievements...",
+    "Detected buzzword cluster in skills section.",
+    "Cross-referencing with 10,000 real resumes...",
+    "Checking if your job titles match your bullets...",
+    "Your 'Excel expert' claim is under careful review.",
+    "Counting how many times you said 'passionate'...",
+    "Looking for that projects section... still looking...",
+    "ATS compatibility check in progress. Praying for you.",
+    "Found generic objective statement. Adding to evidence pile.",
+    "Verifying your '5+ years of experience' claim...",
+    "Evaluating damage to career prospects. Stay calm.",
+  ];
+
+  const terminalSteps = {
+    uploading: [
+      '> Receiving resume file...',
+      '> File format: valid ✓',
+      '> Extracting text content...',
+    ],
+    analyzing: [
+      '> Parsing sections: Experience, Skills, Education...',
+      '> Running ATS compatibility check...',
+      '> Detecting buzzwords and filler phrases...',
+      '> Comparing against job market data...',
+      '> Checking quantifiable achievements...',
+    ],
+    processing: [
+      '> Scoring content quality...',
+      '> Generating improvement suggestions...',
+      '> Crafting your personalized roast...',
+      '> Compiling final report...',
+    ],
+    complete: [
+      '> Analysis complete ✓',
+    ],
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      clearInterval(roastIntervalRef.current);
+      clearInterval(terminalIntervalRef.current);
+      setRoastMsgIndex(0);
+      setTerminalLines([]);
+      return;
+    }
+
+    roastIntervalRef.current = setInterval(() => {
+      setRoastMsgIndex(i => (i + 1) % roastMessages.length);
+    }, 2800);
+
+    return () => {
+      clearInterval(roastIntervalRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!isLoading || !loadingStep) return;
+    const lines = terminalSteps[loadingStep] || [];
+    setTerminalLines([]);
+    let i = 0;
+    terminalIntervalRef.current = setInterval(() => {
+      if (i < lines.length) {
+        setTerminalLines(prev => [...prev, lines[i]]);
+        i++;
+      } else {
+        clearInterval(terminalIntervalRef.current);
+      }
+    }, 600);
+    return () => clearInterval(terminalIntervalRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingStep, isLoading]);
+
   const [formData, setFormData] = useState({
     gender: 'male',
     roastLevel: 'pyar',
@@ -116,6 +196,16 @@ function App() {
     const fileInput = document.getElementById('resumeFile');
     if (fileInput) fileInput.value = '';
   }, []);
+
+  // Push history when results load so browser back button works
+  useEffect(() => {
+    if (results) {
+      window.history.pushState({ resultsPage: true }, '');
+      const handlePop = () => handleReset();
+      window.addEventListener('popstate', handlePop);
+      return () => window.removeEventListener('popstate', handlePop);
+    }
+  }, [results, handleReset]);
 
   // Simple submit handler
   const handleSubmit = useCallback(async (e) => {
@@ -205,13 +295,12 @@ function App() {
     );
   }
 
-  // Results view
   if (results) {
     return (
       <ErrorBoundary>
         <div className="app">
-          <Navbar />
-          <main className="main-content">
+          <Navbar onNavClick={handleReset} />
+          <main>
             <ResultsDisplay results={results} onReset={handleReset} />
           </main>
         </div>
@@ -242,29 +331,67 @@ function App() {
           <Navbar />
           <main className="loading-container">
             <div className="loading-wrapper">
-              <div className="loading-animation">
-                <div className="roast-icons">
-                  <div className="icon fire">🔥</div>
-                  <div className="icon ai">🤖</div>
-                  <div className="icon resume">📄</div>
-                </div>
-                
-                <div className="progress-section">
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ width: `${getProgressPercentage()}%` }}
-                    />
-                  </div>
-                  <div className="progress-percentage">
-                    {getProgressPercentage()}%
-                  </div>
-                </div>
-              </div>
-              
-              <div className="loading-content">
+
+              {/* Header */}
+              <div className="loading-header">
+                <div className="loading-badge">Analyzing</div>
                 <h2 className="loading-title">{getLoadingMessage()}</h2>
+                <p className="loading-filename">📄 {selectedFile?.name}</p>
               </div>
+
+              {/* Progress bar */}
+              <div className="loading-progress-wrap">
+                <div className="loading-progress-track">
+                  <div
+                    className="loading-progress-fill"
+                    style={{ width: `${getProgressPercentage()}%` }}
+                  />
+                </div>
+                <span className="loading-pct">{getProgressPercentage()}%</span>
+              </div>
+
+              {/* Step pills */}
+              <div className="loading-steps-row">
+                {['uploading','analyzing','processing','complete'].map((step, i) => {
+                  const pct = getProgressPercentage();
+                  const thresholds = { uploading: 25, analyzing: 50, processing: 75, complete: 100 };
+                  const done = pct >= thresholds[step];
+                  const active = loadingStep === step;
+                  return (
+                    <div key={step} className={`loading-step-pill ${active ? 'active' : ''} ${done ? 'done' : ''}`}>
+                      <span className="pill-dot">{done && !active ? '✓' : i + 1}</span>
+                      <span className="pill-label">{step.charAt(0).toUpperCase() + step.slice(1)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Terminal */}
+              <div className="loading-terminal">
+                <div className="terminal-bar">
+                  <span className="t-dot red"></span>
+                  <span className="t-dot yellow"></span>
+                  <span className="t-dot green"></span>
+                  <span className="terminal-title">cv-slayer — analyzing</span>
+                </div>
+                <div className="terminal-body">
+                  {terminalLines.map((line, i) => (
+                    <div key={i} className="terminal-line">
+                      <span className="terminal-prompt">$</span> {line}
+                    </div>
+                  ))}
+                  <div className="terminal-cursor">█</div>
+                </div>
+              </div>
+
+              {/* Rotating roast thought */}
+              <div className="loading-thought">
+                <span className="thought-label">AI is thinking:</span>
+                <span className="thought-text" key={roastMsgIndex}>
+                  "{roastMessages[roastMsgIndex]}"
+                </span>
+              </div>
+
             </div>
           </main>
         </div>
@@ -291,24 +418,29 @@ function App() {
                   <span className="title-sub">Resume Roaster</span>
                 </h1>
                 <p className="hero-subtitle">
-                  Get AI-powered feedback on your resume with humor and actionable improvements
+                  Your resume probably isn't as strong as you think. Get honest, brutally useful feedback — with a touch of humor if you want it.
                 </p>
                 <div className="hero-features">
-                  <div className="feature-tag">🤖 AI-Powered</div>
-                  <div className="feature-tag">🎭 Multiple Styles</div>
-                  <div className="feature-tag">🌍 Multi-Language</div>
+                  <div className="feature-tag">AI-Powered</div>
+                  <div className="feature-tag">Multiple Styles</div>
+                  <div className="feature-tag">Hindi / Hinglish</div>
                 </div>
                 <a href="#upload" className="cta-button">
-                  <span>Start Roasting</span>
-                  <div className="cta-icon">🔥</div>
+                  <span>Roast My Resume</span>
+                  <div className="cta-icon">→</div>
                 </a>
               </div>
               <div className="hero-visual">
                 <div className="floating-elements">
-                  <div className="floating-item resume">📄</div>
-                  <div className="floating-item fire">🔥</div>
-                  <div className="floating-item ai">🤖</div>
-                  <div className="floating-item chart">📊</div>
+                  <div className="hero-score-preview">
+                    <div className="hero-score-number">64</div>
+                    <div className="hero-score-label">Resume Score</div>
+                    <div className="hero-score-bars">
+                      <div className="hero-bar"><div className="hero-bar-fill" style={{width:'72%'}}></div></div>
+                      <div className="hero-bar"><div className="hero-bar-fill" style={{width:'45%'}}></div></div>
+                      <div className="hero-bar"><div className="hero-bar-fill" style={{width:'88%'}}></div></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -319,39 +451,39 @@ function App() {
         <section id="features" className="features">
           <div className="container">
             <div className="section-header">
-              <h2>Why Choose CV Slayer?</h2>
-              <p>Professional resume analysis with personality</p>
+              <h2>What you actually get</h2>
+              <p>No generic tips. Real feedback that helps you land interviews.</p>
             </div>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">🤖</div>
-                <h3>AI-Powered Analysis</h3>
-                <p>Advanced AI analyzes content, structure, and ATS compatibility</p>
+                <div className="feature-icon">🔍</div>
+                <h3>Deep Analysis</h3>
+                <p>Content, structure, ATS compatibility — checked line by line</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🎭</div>
-                <h3>Multiple Personalities</h3>
-                <p>Choose from gentle guidance to brutal honesty</p>
+                <div className="feature-icon">🎯</div>
+                <h3>Your style, your call</h3>
+                <p>Gentle nudge or brutal roast — pick the feedback that actually motivates you</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🌍</div>
-                <h3>Multi-Language Support</h3>
-                <p>Get feedback in English, Hindi, or Hinglish</p>
+                <div className="feature-icon">🌐</div>
+                <h3>English, Hindi, Hinglish</h3>
+                <p>Read feedback in the language you think in</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">💡</div>
-                <h3>Actionable Insights</h3>
-                <p>Specific suggestions to improve your resume</p>
+                <div className="feature-icon">📝</div>
+                <h3>Specific suggestions</h3>
+                <p>Not "improve your summary" — actual rewrite examples you can use</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">📊</div>
-                <h3>ATS Optimization</h3>
-                <p>Ensure your resume passes tracking systems</p>
+                <div className="feature-icon">⚡</div>
+                <h3>Fast turnaround</h3>
+                <p>Upload, wait about 30 seconds, get your results</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🔒</div>
-                <h3>Privacy First</h3>
-                <p>Your data is processed securely</p>
+                <div className="feature-icon">🗑️</div>
+                <h3>No data stored</h3>
+                <p>Your resume is deleted right after analysis. No accounts needed.</p>
               </div>
             </div>
           </div>
@@ -360,8 +492,11 @@ function App() {
         {/* Upload Section */}
         <section id="upload" className="upload-section">
           <div className="container">
+            <div className="section-header">
+              <h2>Upload your resume</h2>
+              <p>PDF or Word doc. Takes about 30 seconds.</p>
+            </div>
             <div className="upload-wrapper">
-              
               {error && (
                 <div className="error-alert" role="alert">
                   <div className="error-content">
@@ -498,8 +633,7 @@ function App() {
                   className="submit-button"
                   disabled={!selectedFile || !agreedToTerms || isLoading}
                 >
-                  <span>{isLoading ? 'Analyzing...' : 'Roast My Resume!'}</span>
-                  <div className="submit-icon">🚀</div>
+                  <span>{isLoading ? 'Analyzing...' : 'Roast My Resume'}</span>
                 </button>
               </form>
             </div>
@@ -558,30 +692,30 @@ function App() {
         {/* How It Works */}
         <section className="how-it-works">
           <div className="container">
+            <div className="section-header">
+              <h2>How it works</h2>
+              <p>Four steps, no signup, no credit card.</p>
+            </div>
             <div className="steps-grid">
               <div className="step-card">
                 <div className="step-number">1</div>
-                <div className="step-icon">📤</div>
                 <h3>Upload</h3>
-                <p>Upload your resume</p>
+                <p>Drop your PDF or Word doc</p>
               </div>
               <div className="step-card">
                 <div className="step-number">2</div>
-                <div className="step-icon">⚙️</div>
                 <h3>Customize</h3>
-                <p>Choose preferences</p>
+                <p>Pick your roast level and language</p>
               </div>
               <div className="step-card">
                 <div className="step-number">3</div>
-                <div className="step-icon">🤖</div>
-                <h3>Analyze</h3>
-                <p>AI analyzes content</p>
+                <h3>Wait ~30s</h3>
+                <p>AI reads every section of your resume</p>
               </div>
               <div className="step-card">
                 <div className="step-number">4</div>
-                <div className="step-icon">📊</div>
-                <h3>Results</h3>
-                <p>Get feedback</p>
+                <h3>Read & fix</h3>
+                <p>Get a score, roast, and exact improvements</p>
               </div>
             </div>
           </div>
@@ -591,27 +725,27 @@ function App() {
         <section id="examples" className="sample-results">
           <div className="container">
             <div className="section-header">
-              <h2>Sample Roasts</h2>
-              <p>See different feedback styles</p>
+              <h2>What the feedback looks like</h2>
+              <p>Real examples from different roast styles.</p>
             </div>
             <div className="samples-grid">
               <div className="sample-card funny">
                 <div className="sample-header">
-                  <span className="sample-type">😄 Funny Style</span>
-                  <span className="sample-level">Gentle</span>
+                  <span className="sample-type">Funny · Gentle</span>
+                  <span className="sample-level">Score: 72</span>
                 </div>
                 <blockquote>
-                  "Your resume says 'Excel expert' but I bet you still Google how to make pie charts! 😅"
+                  "You wrote 'Excel expert' on your resume but I have a feeling you still Google 'how to freeze a row.' Your objective section is three lines of corporate jargon that says absolutely nothing. Let's fix that."
                 </blockquote>
               </div>
-              
+
               <div className="sample-card savage">
                 <div className="sample-header">
-                  <span className="sample-type">😈 Savage Style</span>
-                  <span className="sample-level">Brutal</span>
+                  <span className="sample-type">Sarcastic · Savage</span>
+                  <span className="sample-level">Score: 41</span>
                 </div>
                 <blockquote>
-                  "This resume looks like ChatGPT made it in 5 minutes. Way too generic!"
+                  "Ah yes, 'responsible for driving synergies across cross-functional teams.' What does that mean? Nobody knows, including you. This reads like a LinkedIn post from 2017. Your projects section is empty. That's the most honest thing on this page."
                 </blockquote>
               </div>
             </div>
