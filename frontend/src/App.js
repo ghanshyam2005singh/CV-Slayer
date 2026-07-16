@@ -4,7 +4,6 @@ import Navbar from './components/Navbar';
 import ResultsDisplay from './components/ResultsDisplay';
 import AdminPanel from './components/AdminPanel';
 
-// Simple Error Boundary
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -20,11 +19,10 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="error-boundary">
           <div className="error-content">
-            <div className="error-icon">⚠️</div>
             <h2>Something went wrong</h2>
             <p>Please refresh the page and try again.</p>
             <button onClick={() => window.location.reload()} className="error-reload-btn">
-              🔄 Reload Page
+              Reload page
             </button>
           </div>
         </div>
@@ -129,7 +127,6 @@ function App() {
     language: 'english'
   });
 
-  // Simple API config
   const API_CONFIG = useMemo(() => ({
     baseURL: process.env.NODE_ENV === 'production' 
       ? process.env.REACT_APP_API_URL || 'https://cv-slayer.onrender.com'
@@ -138,7 +135,6 @@ function App() {
     maxFileSize: 10 * 1024 * 1024
   }), []);
 
-  // Simple file validation
   const validateFile = useCallback((file) => {
     if (!file) return 'Please select a resume file';
     
@@ -154,7 +150,6 @@ function App() {
     return null;
   }, [API_CONFIG.maxFileSize]);
 
-  // Simple file handler
   const handleFileChange = useCallback((e) => {
     const file = e.target.files[0];
     setError('');
@@ -173,13 +168,11 @@ function App() {
     }
   }, [validateFile]);
 
-  // Simple input handler
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  // Simple reset
   const handleReset = useCallback(() => {
     setResults(null);
     setSelectedFile(null);
@@ -207,7 +200,6 @@ function App() {
     }
   }, [results, handleReset]);
 
-  // Simple submit handler
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
@@ -336,7 +328,7 @@ function App() {
               <div className="loading-header">
                 <div className="loading-badge">Analyzing</div>
                 <h2 className="loading-title">{getLoadingMessage()}</h2>
-                <p className="loading-filename">📄 {selectedFile?.name}</p>
+                <p className="loading-filename">{selectedFile?.name}</p>
               </div>
 
               {/* Progress bar */}
@@ -456,32 +448,26 @@ function App() {
             </div>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">🔍</div>
-                <h3>Deep Analysis</h3>
+                <h3>Deep analysis</h3>
                 <p>Content, structure, ATS compatibility — checked line by line</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🎯</div>
                 <h3>Your style, your call</h3>
                 <p>Gentle nudge or brutal roast — pick the feedback that actually motivates you</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🌐</div>
                 <h3>English, Hindi, Hinglish</h3>
                 <p>Read feedback in the language you think in</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">📝</div>
                 <h3>Specific suggestions</h3>
                 <p>Not "improve your summary" — actual rewrite examples you can use</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">⚡</div>
                 <h3>Fast turnaround</h3>
                 <p>Upload, wait about 30 seconds, get your results</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🗑️</div>
                 <h3>No data stored</h3>
                 <p>Your resume is deleted right after analysis. No accounts needed.</p>
               </div>
@@ -500,7 +486,6 @@ function App() {
               {error && (
                 <div className="error-alert" role="alert">
                   <div className="error-content">
-                    <span className="error-icon">⚠️</span>
                     <span className="error-text">{error}</span>
                     <button 
                       className="error-close"
@@ -516,7 +501,6 @@ function App() {
                 <div className="file-upload-section">
                   <label htmlFor="resumeFile" className="file-upload-label">
                     <div className="file-upload-area">
-                      <div className="file-icon">📄</div>
                       <div className="file-text">
                         <span className="file-primary">
                           {selectedFile ? selectedFile.name : "Choose your resume"}
@@ -564,9 +548,9 @@ function App() {
                         onChange={handleInputChange}
                         disabled={isLoading}
                       >
-                        <option value="pyar">😊 Gentle</option>
-                        <option value="ache">🤔 Balanced</option>
-                        <option value="dhang">😈 Savage</option>
+                        <option value="pyar">Gentle</option>
+                        <option value="ache">Balanced</option>
+                        <option value="dhang">Savage</option>
                       </select>
                     </div>
                   </div>
@@ -580,10 +564,10 @@ function App() {
                         onChange={handleInputChange}
                         disabled={isLoading}
                       >
-                        <option value="funny">😄 Funny</option>
-                        <option value="serious">🎯 Professional</option>
-                        <option value="sarcastic">😏 Sarcastic</option>
-                        <option value="motivational">💪 Motivational</option>
+                        <option value="funny">Funny</option>
+                        <option value="serious">Professional</option>
+                        <option value="sarcastic">Sarcastic</option>
+                        <option value="motivational">Motivational</option>
                       </select>
                     </div>
                   </div>
@@ -597,9 +581,9 @@ function App() {
                         onChange={handleInputChange}
                         disabled={isLoading}
                       >
-                        <option value="english">🇺🇸 English</option>
-                        <option value="hindi">🇮🇳 Hindi</option>
-                        <option value="hinglish">🌍 Hinglish</option>
+                        <option value="english">English</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="hinglish">Hinglish</option>
                       </select>
                     </div>
                   </div>
@@ -657,12 +641,12 @@ function App() {
               <div className="modal-body">
                 <div className="terms-content">
                   <section>
-                    <h4>🔐 Privacy & Data</h4>
+                    <h4>Privacy & data</h4>
                     <p>Your resume is processed temporarily for analysis. Files are deleted after processing.</p>
                   </section>
 
                   <section>
-                    <h4>🤖 AI Analysis</h4>
+                    <h4>AI analysis</h4>
                     <p>We use AI to analyze your resume and provide feedback.</p>
                   </section>
                 </div>

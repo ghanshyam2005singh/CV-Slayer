@@ -5,21 +5,18 @@ const ResultsDisplay = ({ results, onReset }) => {
   const [activeTab, setActiveTab] = useState('roast');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  // Simple decode function
   function decodeHtmlEntities(text) {
     const txt = document.createElement('textarea');
     txt.innerHTML = text;
     return txt.value;
   }
 
-  // Simple score calculation
   const sanitizedScore = useMemo(() => {
     if (!results || !results.score) return 0;
     const numScore = Number(results.score);
     return isNaN(numScore) ? 0 : Math.max(0, Math.min(100, Math.round(numScore)));
   }, [results]);
 
-  // Simple file name
   const sanitizedFileName = useMemo(() => {
     if (!results || !results.originalFileName) return 'Unknown File';
     const fileName = results.originalFileName;
@@ -29,7 +26,6 @@ const ResultsDisplay = ({ results, onReset }) => {
       fileName;
   }, [results]);
 
-  // Simple improvements validation
   const validImprovements = useMemo(() => {
     if (!results || !Array.isArray(results.improvements)) return [];
     
@@ -52,7 +48,6 @@ const ResultsDisplay = ({ results, onReset }) => {
       .slice(0, 10);
   }, [results]);
 
-  // Simple strengths/weaknesses
   const validStrengths = useMemo(() => {
     if (!results || !Array.isArray(results.strengths)) return [];
     return results.strengths
@@ -69,19 +64,11 @@ const ResultsDisplay = ({ results, onReset }) => {
       .slice(0, 8);
   }, [results]);
 
-  // Simple score utilities
   const getScoreColor = useCallback((score) => {
     const validScore = Number(score) || 0;
     if (validScore >= 80) return '#2ecc71';
     if (validScore >= 60) return '#f39c12';
     return '#e74c3c';
-  }, []);
-
-  const getScoreEmoji = useCallback((score) => {
-    const validScore = Number(score) || 0;
-    if (validScore >= 80) return '🎯';
-    if (validScore >= 60) return '👍';
-    return '💪';
   }, []);
 
   const getScoreDescription = useCallback((score) => {
@@ -91,7 +78,6 @@ const ResultsDisplay = ({ results, onReset }) => {
     return "Let's transform your resume into a powerful tool.";
   }, []);
 
-  // Simple tab change
   const handleTabChange = useCallback((tabName) => {
     const validTabs = ['roast', 'improvements', 'analysis'];
     if (validTabs.includes(tabName)) {
@@ -99,12 +85,10 @@ const ResultsDisplay = ({ results, onReset }) => {
     }
   }, []);
 
-  // Simple print
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
 
-  // Simple copy
   const copyToClipboard = useCallback(async (text) => {
     try {
       const sanitizedText = typeof text === 'string' ? text.substring(0, 1000) : '';
@@ -129,7 +113,6 @@ const ResultsDisplay = ({ results, onReset }) => {
     }
   }, []);
 
-  // Simple reset handlers
   const handleResetRequest = useCallback(() => {
     setShowResetConfirm(true);
   }, []);
@@ -143,7 +126,6 @@ const ResultsDisplay = ({ results, onReset }) => {
     setShowResetConfirm(false);
   }, []);
 
-  // Simple share
   const handleShare = useCallback(async () => {
     try {
       const shareData = {
@@ -162,7 +144,6 @@ const ResultsDisplay = ({ results, onReset }) => {
     }
   }, [sanitizedScore, copyToClipboard]);
 
-  // Simple text sanitization
   const sanitizeText = useCallback((text) => {
     if (typeof text !== 'string') return [];
     return text
@@ -176,7 +157,6 @@ const ResultsDisplay = ({ results, onReset }) => {
     return (
       <div className="results-page">
         <div className="results-error">
-          <span className="error-icon">📄</span>
           <h3>No Results Available</h3>
           <p>The analysis results could not be loaded. Please try again.</p>
           <button onClick={onReset} className="action-button primary">Try Again</button>
@@ -237,7 +217,7 @@ const ResultsDisplay = ({ results, onReset }) => {
               <span className="score-label">/ 100</span>
             </div>
             <div className="score-details">
-              <h2 className="score-title">{getScoreEmoji(sanitizedScore)} Overall Resume Score</h2>
+              <h2 className="score-title">Overall Resume Score</h2>
               <p className="score-description">{getScoreDescription(sanitizedScore)}</p>
               <div className="score-breakdown">
                 <div className="score-bar">
@@ -254,16 +234,13 @@ const ResultsDisplay = ({ results, onReset }) => {
         {/* Tabs */}
         <div className="results-tabs">
           <button className={`tab-button ${activeTab === 'roast' ? 'active' : ''}`} onClick={() => handleTabChange('roast')}>
-            <span className="tab-icon">🔥</span>
             <span className="tab-text">Feedback</span>
           </button>
           <button className={`tab-button ${activeTab === 'improvements' ? 'active' : ''}`} onClick={() => handleTabChange('improvements')}>
-            <span className="tab-icon">💡</span>
             <span className="tab-text">Improvements</span>
             <span className="tab-count">{validImprovements.length}</span>
           </button>
           <button className={`tab-button ${activeTab === 'analysis' ? 'active' : ''}`} onClick={() => handleTabChange('analysis')}>
-            <span className="tab-icon">📊</span>
             <span className="tab-text">Analysis</span>
           </button>
         </div>
@@ -273,7 +250,7 @@ const ResultsDisplay = ({ results, onReset }) => {
           {activeTab === 'roast' && (
             <div className="content-section">
               <div className="section-header">
-                <h3><span className="section-icon">🔥</span> The Roast</h3>
+                <h3>The Roast</h3>
                 <p>Honest, unfiltered feedback on your resume</p>
               </div>
               <div className="feedback-text">
@@ -285,14 +262,13 @@ const ResultsDisplay = ({ results, onReset }) => {
                   </div>
                 ) : (
                   <div className="no-content">
-                    <span className="no-content-icon">📝</span>
                     <p>No feedback available.</p>
                   </div>
                 )}
               </div>
               <div className="section-actions">
                 <button className="action-button secondary small" onClick={() => copyToClipboard(roastFeedback)}>
-                  📋 Copy feedback
+                  Copy feedback
                 </button>
               </div>
             </div>
@@ -301,7 +277,7 @@ const ResultsDisplay = ({ results, onReset }) => {
           {activeTab === 'improvements' && (
             <div className="content-section">
               <div className="section-header">
-                <h3><span className="section-icon">💡</span> What to fix</h3>
+                <h3>What to fix</h3>
                 <p>Specific, actionable improvements ranked by impact</p>
               </div>
               <div className="improvements-list">
@@ -309,9 +285,6 @@ const ResultsDisplay = ({ results, onReset }) => {
                   <div key={i} className={`improvement-item priority-${imp.priority}`}>
                     <div className="improvement-header">
                       <div className="improvement-priority">
-                        <span className="priority-indicator">
-                          {imp.priority === 'high' ? '🔴' : imp.priority === 'medium' ? '🟡' : '🟢'}
-                        </span>
                         <span className="priority-text">{imp.priority} priority</span>
                       </div>
                     </div>
@@ -327,7 +300,6 @@ const ResultsDisplay = ({ results, onReset }) => {
                   </div>
                 )) : (
                   <div className="no-content">
-                    <span className="no-content-icon">✨</span>
                     <p>No improvements identified — your resume looks solid!</p>
                   </div>
                 )}
@@ -338,13 +310,13 @@ const ResultsDisplay = ({ results, onReset }) => {
           {activeTab === 'analysis' && (
             <div className="content-section">
               <div className="section-header">
-                <h3><span className="section-icon">📊</span> Strengths & Weaknesses</h3>
+                <h3>Strengths & Weaknesses</h3>
                 <p>A full breakdown of what's working and what isn't</p>
               </div>
               <div className="analysis-grid">
                 <div className="strengths-section">
                   <div className="subsection-header">
-                    <h4><span className="subsection-icon">✅</span> Strengths <span className="item-count">{validStrengths.length}</span></h4>
+                    <h4>Strengths <span className="item-count">{validStrengths.length}</span></h4>
                   </div>
                   {validStrengths.length > 0 ? (
                     <ul className="analysis-list strengths-list">
@@ -361,7 +333,7 @@ const ResultsDisplay = ({ results, onReset }) => {
                 </div>
                 <div className="weaknesses-section">
                   <div className="subsection-header">
-                    <h4><span className="subsection-icon">⚠️</span> Areas to fix <span className="item-count">{validWeaknesses.length}</span></h4>
+                    <h4>Areas to fix <span className="item-count">{validWeaknesses.length}</span></h4>
                   </div>
                   {validWeaknesses.length > 0 ? (
                     <ul className="analysis-list weaknesses-list">

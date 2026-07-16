@@ -8,34 +8,26 @@ const Navbar = ({ onNavClick }) => {
   const [activeSection, setActiveSection] = useState('home');
   const [error, setError] = useState('');
 
-  // PRODUCTION FIX - Debounced scroll handler with rate limiting
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     setIsScrolled(scrollY > 50);
-    
-    // PRODUCTION FIX - Validate sections array
-    const validSections = ['home', 'features', 'upload', 'examples', 'contact'];
+
+    const sections = ['home', 'features', 'upload', 'examples', 'contact'];
     let currentSection = 'home';
-    
-    try {
-      for (const sectionId of validSections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            currentSection = sectionId;
-            break;
-          }
+
+    for (const sectionId of sections) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= 100 && rect.bottom >= 100) {
+          currentSection = sectionId;
+          break;
         }
       }
-      setActiveSection(currentSection);
-    } catch (error) {
-      // PRODUCTION FIX - Silent fail for scroll detection
-      console.debug('Navigation scroll detection failed');
     }
+    setActiveSection(currentSection);
   }, []);
 
-  // PRODUCTION FIX - Enhanced scroll event listener with proper throttling
   useEffect(() => {
     let ticking = false;
     let lastScrollTime = 0;
@@ -68,107 +60,55 @@ const Navbar = ({ onNavClick }) => {
     };
   }, [handleScroll]);
 
-  // Enhanced menu toggle with accessibility
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(prev => {
       const newState = !prev;
-      
-      // PRODUCTION FIX - Safe body scroll prevention
-      try {
-        if (newState) {
-          document.body.style.overflow = 'hidden';
-          document.body.setAttribute('aria-hidden', 'true');
-        } else {
-          document.body.style.overflow = 'unset';
-          document.body.removeAttribute('aria-hidden');
-        }
-      } catch (error) {
-        // Silent fail for body style changes
+      document.body.style.overflow = newState ? 'hidden' : 'unset';
+      if (newState) {
+        document.body.setAttribute('aria-hidden', 'true');
+      } else {
+        document.body.removeAttribute('aria-hidden');
       }
-      
       return newState;
     });
   }, []);
 
-  // PRODUCTION FIX - Enhanced scroll to section with input validation
   const scrollToSection = useCallback(async (sectionId) => {
-    // If we're on the results page, any nav click goes back to home
+    // On the results page, any nav click just goes back to home
     if (onNavClick) {
       onNavClick();
       return;
     }
 
-    // Input validation
-    if (!sectionId || typeof sectionId !== 'string') {
-      setError('Navigation failed. Please try again.');
-      return;
-    }
-
-    // Sanitize input
-    const sanitizedSectionId = sectionId.replace(/[^a-zA-Z0-9-_]/g, '');
     const validSections = ['home', 'features', 'upload', 'examples', 'contact'];
-    
-    if (!validSections.includes(sanitizedSectionId)) {
+    if (!validSections.includes(sectionId)) {
       setError('Section not found.');
       return;
     }
 
     setError('');
     setIsLoading(true);
-    
-    try {
-      const element = document.getElementById(sanitizedSectionId);
-      
-      if (!element) {
-        throw new Error('Section not available');
-      }
 
-      // Close mobile menu safely
-      setIsMenuOpen(false);
-      try {
-        document.body.style.overflow = 'unset';
-        document.body.removeAttribute('aria-hidden');
-      } catch (error) {
-        // Silent fail
-      }
-
-      // PRODUCTION FIX - Safe navbar height calculation
-      let navbarHeight = 80;
-      try {
-        const navbar = document.querySelector('.navbar');
-        if (navbar) {
-          navbarHeight = navbar.offsetHeight;
-        }
-      } catch (error) {
-        // Use default height
-      }
-
-      const elementPosition = Math.max(0, element.offsetTop - navbarHeight);
-
-      // Smooth scroll with error handling
-      if ('scrollTo' in window) {
-        window.scrollTo({
-          top: elementPosition,
-          behavior: 'smooth'
-        });
-      } else {
-        // Fallback for older browsers
-        window.scrollTop = elementPosition;
-      }
-
-      // Update active section
-      setActiveSection(sanitizedSectionId);
-
-    } catch (error) {
-      // PRODUCTION FIX - Generic error message
+    const element = document.getElementById(sectionId);
+    if (!element) {
       setError('Navigation failed. Please try again.');
-      
-      // Auto-clear error after 3 seconds
       setTimeout(() => setError(''), 3000);
-    } finally {
       setIsLoading(false);
+      return;
     }
-  }, []);
+
+    setIsMenuOpen(false);
+    document.body.style.overflow = 'unset';
+    document.body.removeAttribute('aria-hidden');
+
+    const navbar = document.querySelector('.navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 80;
+    const elementPosition = Math.max(0, element.offsetTop - navbarHeight);
+
+    window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+    setActiveSection(sectionId);
+    setIsLoading(false);
+  }, [onNavClick]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event, sectionId) => {
@@ -178,17 +118,12 @@ const Navbar = ({ onNavClick }) => {
     }
   }, [scrollToSection]);
 
-  // PRODUCTION FIX - Safe escape key handler
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape' && isMenuOpen) {
         setIsMenuOpen(false);
-        try {
-          document.body.style.overflow = 'unset';
-          document.body.removeAttribute('aria-hidden');
-        } catch (error) {
-          // Silent fail
-        }
+        document.body.style.overflow = 'unset';
+        document.body.removeAttribute('aria-hidden');
       }
     };
 
@@ -198,17 +133,12 @@ const Navbar = ({ onNavClick }) => {
     }
   }, [isMenuOpen]);
 
-  // PRODUCTION FIX - Safe click outside handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMenuOpen && event.target && !event.target.closest('.navbar-container')) {
         setIsMenuOpen(false);
-        try {
-          document.body.style.overflow = 'unset';
-          document.body.removeAttribute('aria-hidden');
-        } catch (error) {
-          // Silent fail
-        }
+        document.body.style.overflow = 'unset';
+        document.body.removeAttribute('aria-hidden');
       }
     };
 
@@ -218,52 +148,20 @@ const Navbar = ({ onNavClick }) => {
     }
   }, [isMenuOpen]);
 
-  // PRODUCTION FIX - Safe cleanup on unmount
   useEffect(() => {
     return () => {
-      try {
-        document.body.style.overflow = 'unset';
-        document.body.removeAttribute('aria-hidden');
-      } catch (error) {
-        // Silent fail during cleanup
-      }
+      document.body.style.overflow = 'unset';
+      document.body.removeAttribute('aria-hidden');
     };
   }, []);
 
-  // PRODUCTION FIX - Memoized navigation items with validation
   const navigationItems = useMemo(() => [
-    { 
-      id: 'home', 
-      label: 'Home', 
-      ariaLabel: 'Navigate to home section',
-      isValid: true 
-    },
-    { 
-      id: 'features', 
-      label: 'Features', 
-      ariaLabel: 'Navigate to features section',
-      isValid: true 
-    },
-    { 
-      id: 'upload', 
-      label: 'Upload Resume', 
-      ariaLabel: 'Navigate to resume upload section', 
-      isSpecial: true,
-      isValid: true 
-    },
-    { 
-      id: 'examples', 
-      label: 'Examples', 
-      ariaLabel: 'Navigate to examples section',
-      isValid: true 
-    },
-    { 
-      id: 'contact', 
-      label: 'Contact', 
-      ariaLabel: 'Navigate to contact section',
-      isValid: true 
-    }
-  ].filter(item => item.isValid), []);
+    { id: 'home', label: 'Home', ariaLabel: 'Navigate to home section' },
+    { id: 'features', label: 'Features', ariaLabel: 'Navigate to features section' },
+    { id: 'upload', label: 'Upload Resume', ariaLabel: 'Navigate to resume upload section', isSpecial: true },
+    { id: 'examples', label: 'Examples', ariaLabel: 'Navigate to examples section' },
+    { id: 'contact', label: 'Contact', ariaLabel: 'Navigate to contact section' }
+  ], []);
 
   // Handle logo click with loading state
   const handleLogoClick = useCallback(async () => {
@@ -272,11 +170,10 @@ const Navbar = ({ onNavClick }) => {
 
   return (
     <>
-      {/* PRODUCTION FIX - Error notification with auto-dismiss */}
       {error && (
         <div className="navbar-error" role="alert" aria-live="polite">
-          <span>⚠️ {error}</span>
-          <button 
+          <span>{error}</span>
+          <button
             onClick={() => setError('')} 
             className="error-close"
             aria-label="Close error message"
@@ -293,8 +190,7 @@ const Navbar = ({ onNavClick }) => {
         aria-label="Main navigation"
       >
         <div className="navbar-container">
-          {/* PRODUCTION FIX - Enhanced Logo with safe loading state */}
-          <div 
+          <div
             className={`navbar-logo ${isLoading ? 'loading' : ''}`}
             onClick={handleLogoClick}
             onKeyDown={(e) => handleKeyDown(e, 'home')}
@@ -314,8 +210,7 @@ const Navbar = ({ onNavClick }) => {
             </span>
           </div>
 
-          {/* PRODUCTION FIX - Enhanced Desktop Navigation with validation */}
-          <ul 
+          <ul
             className={`navbar-menu ${isMenuOpen ? 'navbar-menu-active' : ''}`}
             role="menubar"
             id="navbar-menu"
@@ -346,7 +241,6 @@ const Navbar = ({ onNavClick }) => {
             ))}
           </ul>
 
-          {/* PRODUCTION FIX - Enhanced Mobile Menu Toggle */}
           <button
             className={`navbar-toggle ${isMenuOpen ? 'active' : ''}`}
             onClick={toggleMenu}
@@ -370,18 +264,13 @@ const Navbar = ({ onNavClick }) => {
           </button>
         </div>
 
-        {/* PRODUCTION FIX - Safe mobile menu overlay */}
         {isMenuOpen && (
-          <div 
+          <div
             className="navbar-overlay"
             onClick={() => {
               setIsMenuOpen(false);
-              try {
-                document.body.style.overflow = 'unset';
-                document.body.removeAttribute('aria-hidden');
-              } catch (error) {
-                // Silent fail
-              }
+              document.body.style.overflow = 'unset';
+              document.body.removeAttribute('aria-hidden');
             }}
             aria-hidden="true"
             role="presentation"

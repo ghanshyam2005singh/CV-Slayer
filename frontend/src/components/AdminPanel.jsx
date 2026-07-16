@@ -13,27 +13,23 @@ const AdminPanel = () => {
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [error, setError] = useState('');
 
-  // Simple API configuration
   const API_BASE = useMemo(() => {
     return process.env.NODE_ENV === 'production' 
       ? `${window.location.origin}/api`
       : 'http://localhost:5000/api';
   }, []);
 
-  // Simple text cleaning
   const cleanText = (text) => {
     if (!text || typeof text !== 'string') return text;
     return text.replace(/[^\x20-\x7E]/g, '').trim();
   };
 
-  // Simple validation
   const isTokenValid = useCallback(() => {
     const token = localStorage.getItem('adminToken');
     const expiry = localStorage.getItem('adminTokenExpiry');
     return token && expiry && Date.now() < parseInt(expiry);
   }, []);
 
-  // Simple logout
   const handleLogout = useCallback(() => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminTokenExpiry');
@@ -44,7 +40,6 @@ const AdminPanel = () => {
     setError('');
   }, []);
 
-  // Simple API request
   const apiRequest = useCallback(async (endpoint, options = {}) => {
     if (!isTokenValid()) {
       setIsAuthenticated(false);
@@ -73,7 +68,6 @@ const AdminPanel = () => {
     return response.json();
   }, [API_BASE, isTokenValid, handleLogout]);
 
-  // Simple dashboard loading
   const loadDashboard = useCallback(async () => {
     try {
       setLoading(true);
@@ -118,7 +112,6 @@ const AdminPanel = () => {
     }
   }, [apiRequest]);
 
-  // Simple login
   const handleLogin = useCallback(async (e) => {
     e.preventDefault();
     if (!email || !password) return;
@@ -163,7 +156,6 @@ const AdminPanel = () => {
     }
   }, [email, password, API_BASE, loadDashboard]);
 
-  // Simple resumes loading
   const loadResumes = useCallback(async () => {
     try {
       setLoading(true);
@@ -207,7 +199,6 @@ const AdminPanel = () => {
     }
   }, [apiRequest]);
 
-  // Simple resume click handler
   const handleResumeClick = useCallback(async (resume) => {
     try {
       const result = await apiRequest(`/admin/resume/${resume.id}`);
@@ -239,7 +230,6 @@ const AdminPanel = () => {
     }
   }, [error]);
 
-  // Simple resume details renderer
   const renderResumeDetails = () => {
     if (!selectedResume) return null;
     
@@ -250,14 +240,14 @@ const AdminPanel = () => {
     
     return (
       <div className="resume-details">
-        <h3>📄 Basic Information</h3>
+        <h3>Basic Information</h3>
         <div className="info-grid">
           <p><strong>File:</strong> {cleanText(fileInfo.originalFileName || fileInfo.fileName || 'Unknown')}</p>
           <p><strong>Size:</strong> {((fileInfo.fileSize || 0) / 1024).toFixed(2)} KB</p>
           <p><strong>Uploaded:</strong> {new Date(selectedResume.createdAt || Date.now()).toLocaleString()}</p>
         </div>
 
-        <h3>👤 Personal Information</h3>
+        <h3>Personal Information</h3>
         <div className="personal-info-grid">
           <p><strong>Name:</strong> {cleanText(personalInfo.name || 'Not extracted')}</p>
           <p><strong>Email:</strong> {cleanText(personalInfo.email || 'Not found')}</p>
@@ -267,13 +257,13 @@ const AdminPanel = () => {
 
         {analysis.overallScore && (
           <>
-            <h3>📊 Analysis Results</h3>
+            <h3>Analysis Results</h3>
             <div className="analysis-section">
               <p><strong>Overall Score:</strong> <span className="score-highlight">{analysis.overallScore}/100</span></p>
-              
+
               {analysis.feedback && (
                 <div className="feedback-section">
-                  <h4>🤖 AI Feedback:</h4>
+                  <h4>AI Feedback:</h4>
                   <div className="feedback-text">
                     {cleanText(analysis.feedback)}
                   </div>
@@ -285,7 +275,7 @@ const AdminPanel = () => {
 
         {Object.keys(preferences).length > 0 && (
           <>
-            <h3>⚙️ User Preferences</h3>
+            <h3>User Preferences</h3>
             <div className="preferences-grid">
               <p><strong>Gender:</strong> {preferences.gender || 'N/A'}</p>
               <p><strong>Roast Level:</strong> {preferences.roastLevel || 'N/A'}</p>
@@ -298,19 +288,18 @@ const AdminPanel = () => {
     );
   };
 
-  // LOGIN UI
   if (!isAuthenticated) {
     return (
       <div className="admin-login">
         <div className="login-container">
           <div className="login-header">
-            <h2>🛡️ Admin Panel</h2>
+            <h2>Admin Panel</h2>
             <p>CV Slayer Dashboard</p>
           </div>
           
           {error && (
             <div className="error-alert">
-              <span>⚠️ {cleanText(error)}</span>
+              <span>{cleanText(error)}</span>
               <button onClick={() => setError('')} className="close-btn">×</button>
             </div>
           )}
@@ -345,7 +334,7 @@ const AdminPanel = () => {
               disabled={loading || !email || !password}
               className="login-btn"
             >
-              {loading ? '🔄 Signing in...' : '🔐 Sign In'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         </div>
@@ -353,75 +342,68 @@ const AdminPanel = () => {
     );
   }
 
-  // MAIN ADMIN UI
   return (
     <div className="admin-panel">
       {error && (
         <div className="error-banner">
-          <span>⚠️ {cleanText(error)}</span>
+          <span>{cleanText(error)}</span>
           <button onClick={() => setError('')}>×</button>
         </div>
       )}
 
-      {/* Header */}
       <header className="admin-header">
         <div className="header-content">
-          <h1>📊 CV Slayer Admin</h1>
+          <h1>CV Slayer Admin</h1>
           <div className="header-actions">
             <div className="nav-tabs">
-              <button 
+              <button
                 className={`nav-tab ${currentView === 'dashboard' ? 'active' : ''}`}
                 onClick={() => { setCurrentView('dashboard'); loadDashboard(); }}
                 disabled={loading}
               >
-                📈 Dashboard
+                Dashboard
               </button>
               <button 
                 className={`nav-tab ${currentView === 'resumes' ? 'active' : ''}`}
                 onClick={() => { setCurrentView('resumes'); loadResumes(); }}
                 disabled={loading}
               >
-                📄 Resumes ({resumes.length})
+                Resumes ({resumes.length})
               </button>
             </div>
             <button onClick={handleLogout} className="logout-btn">
-              🚪 Logout
+              Logout
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="admin-content">
         {loading && (
           <div className="loading-overlay">
-            <div className="loading-spinner">🔄</div>
+            <div className="loading-spinner" aria-hidden="true"></div>
             <p>Loading...</p>
           </div>
         )}
 
-        {/* Dashboard View */}
         {currentView === 'dashboard' && !loading && (
           <div className="dashboard-view">
             <div className="stats-grid">
               <div className="stat-card">
-                <div className="stat-icon">📄</div>
                 <div className="stat-content">
                   <h3>Total Resumes</h3>
                   <p className="stat-number">{dashboardData?.totalResumes || 0}</p>
                 </div>
               </div>
-              
+
               <div className="stat-card">
-                <div className="stat-icon">📅</div>
                 <div className="stat-content">
                   <h3>Today's Uploads</h3>
                   <p className="stat-number">{dashboardData?.todayResumes || 0}</p>
                 </div>
               </div>
-              
+
               <div className="stat-card">
-                <div className="stat-icon">⭐</div>
                 <div className="stat-content">
                   <h3>Average Score</h3>
                   <p className="stat-number">{(dashboardData?.averageScore || 0).toFixed(1)}/100</p>
@@ -430,12 +412,12 @@ const AdminPanel = () => {
             </div>
 
             <div className="recent-section">
-              <h3>📋 Recent Resumes</h3>
+              <h3>Recent Resumes</h3>
               {dashboardData?.recentResumes?.length > 0 ? (
                 <div className="recent-list">
                   {dashboardData.recentResumes.map((resume, index) => (
-                    <div 
-                      key={resume.id || index} 
+                    <div
+                      key={resume.id || index}
                       className="recent-item"
                       onClick={() => handleResumeClick(resume)}
                     >
@@ -451,20 +433,19 @@ const AdminPanel = () => {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <p>📭 No resumes uploaded yet</p>
+                  <p>No resumes uploaded yet</p>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Resumes View */}
         {currentView === 'resumes' && !loading && (
           <div className="resumes-view">
             <div className="view-header">
-              <h3>📄 All Resumes ({resumes.length})</h3>
+              <h3>All Resumes ({resumes.length})</h3>
             </div>
-            
+
             {resumes.length > 0 ? (
               <div className="resumes-grid">
                 {resumes.map((resume, index) => (
@@ -495,13 +476,13 @@ const AdminPanel = () => {
                       
                       <div className="contact-indicators">
                         <span className={`indicator ${resume.hasEmail ? 'has' : 'missing'}`}>
-                          📧 {resume.hasEmail ? '✓' : '✗'}
+                          Email {resume.hasEmail ? '✓' : '✗'}
                         </span>
                         <span className={`indicator ${resume.hasPhone ? 'has' : 'missing'}`}>
-                          📱 {resume.hasPhone ? '✓' : '✗'}
+                          Phone {resume.hasPhone ? '✓' : '✗'}
                         </span>
                         <span className={`indicator ${resume.hasLinkedIn ? 'has' : 'missing'}`}>
-                          💼 {resume.hasLinkedIn ? '✓' : '✗'}
+                          LinkedIn {resume.hasLinkedIn ? '✓' : '✗'}
                         </span>
                       </div>
                     </div>
@@ -510,21 +491,20 @@ const AdminPanel = () => {
               </div>
             ) : (
               <div className="empty-state">
-                <p>📭 No resumes found</p>
+                <p>No resumes found</p>
               </div>
             )}
           </div>
         )}
       </main>
 
-      {/* Resume Modal */}
       {showResumeModal && selectedResume && (
         <div className="modal-overlay" onClick={() => setShowResumeModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>📄 Resume Details</h2>
-              <button 
-                className="close-btn" 
+              <h2>Resume Details</h2>
+              <button
+                className="close-btn"
                 onClick={() => setShowResumeModal(false)}
               >
                 ×

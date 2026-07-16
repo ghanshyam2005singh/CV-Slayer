@@ -291,12 +291,6 @@ body {
   background: var(--cream);
 }
 
-.feature-icon {
-  font-size: 1.6rem;
-  margin-bottom: 16px;
-  display: block;
-}
-
 .feature-card h3 {
   font-size: 1.05rem;
   font-weight: 700;
@@ -344,11 +338,6 @@ body {
   align-items: center;
   padding: 12px 16px;
   gap: 10px;
-}
-
-.error-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
 }
 
 .error-text {
@@ -410,11 +399,6 @@ body {
 .file-upload-area:hover {
   border-color: var(--accent);
   background: #FFF5F4;
-}
-
-.file-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
 }
 
 .file-text {
@@ -1239,12 +1223,6 @@ select:hover {
   border-radius: 10px;
   border: 1px solid var(--border);
   max-width: 440px;
-  display: block;
-}
-
-.error-boundary .error-icon {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
   display: block;
 }
 
